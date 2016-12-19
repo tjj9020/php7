@@ -8,8 +8,22 @@ pkg_source=http://php.net/get/${pkg_distname}-${pkg_version}.tar.bz2/from/this/m
 pkg_shasum=68bcfd7deed5b3474d81dec9f74d122058327e2bed0ac25bbc9ec70995228e61
 pkg_filename=${pkg_distname}-${pkg_version}.tar.bz2
 pkg_dirname=${pkg_distname}-${pkg_version}
-pkg_deps=(core/libxml2 core/curl core/zlib core/openssl core/bzip2)
-pkg_build_deps=(core/bison2 core/gcc core/make core/re2c core/libpng)
+pkg_deps=(
+  core/libxml2 
+  core/curl 
+  core/zlib
+  core/openssl 
+  core/bzip2 
+  pftim/libpng 
+  core/libjpeg-turbo 
+  pftim/libmcrypt 
+  nsdavidson/mysql-client
+)
+pkg_build_deps=(
+  core/bison2 
+  core/gcc 
+  core/make 
+  core/re2c )
 pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
 pkg_lib_dirs=(lib)
@@ -33,17 +47,17 @@ do_build() {
     --with-curl="$(pkg_path_for curl)" \
     --with-openssl="$(pkg_path_for openssl)" \
     --with-xmlrpc \
-    --with-zlib="$(pkg_path_for zlib)" \
-    --with-mysql \
     --with-bz2="$(pkg_path_for bzip2)" \
     --with-calendar \
     --with-gd \
-    --with-mysqlnd \
-    --with-mcrypt \
-    --with-cli \
+    --with-zlib="$(pkg_path_for zlib)" \
+    --with-png-dir="$(pkg_path_for libpng)" \
+    --with-jpeg-dir="$(pkg_path_for libjpeg-turbo)" \
+    --with-mcrypt="$(pkg_path_for libmcrypt)" \
     --with-curl="$(pkg_path_for curl)" \
-    --with-imagick \
-    --with-redis 
+    --with-mysql=mysqlnd \
+    --with-mysqli=mysqlnd \
+    --with-pdo-mysql=mysqlnd \
 
   make
 }
