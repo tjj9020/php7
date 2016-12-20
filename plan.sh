@@ -9,6 +9,7 @@ pkg_shasum=68bcfd7deed5b3474d81dec9f74d122058327e2bed0ac25bbc9ec70995228e61
 pkg_filename=${pkg_distname}-${pkg_version}.tar.bz2
 pkg_dirname=${pkg_distname}-${pkg_version}
 pkg_deps=(
+  core/coreutils
   core/libxml2 
   core/curl 
   core/zlib
@@ -23,11 +24,19 @@ pkg_build_deps=(
   core/bison2 
   core/gcc 
   core/make 
-  core/re2c )
+  core/re2c 
+  core/autoconf
+)
 pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
 pkg_lib_dirs=(lib)
 pkg_interpreters=(bin/php)
+
+do_download() {
+  do_default_download
+  # Download Composer
+  download_file https://getcomposer.org/installer composer-setup.php
+}
 
 do_prepare() {
   # The configure script expects libxml2 binaries to either be in `/usr/bin`, `/usr/local/bin` or be
@@ -62,6 +71,23 @@ do_build() {
   make
 }
 
+do_install() {
+  do_default_install
+
+  # Install Composer
+  "$pkg_prefix/bin/php" "$HAB_CACHE_SRC_PATH/composer-setup.php" \
+    --filename=composer \
+    --install-dir="$pkg_prefix/bin"
+  fix_interpreter "$pkg_prefix/bin/composer" core/coreutils bin/env
+
+  # Modify PHP-FPM config so it will be able to run out of the box. To run a real
+  # PHP-FPM application you would want to supply your own config with
+  # --fpm-config <file>.
+  mv "$pkg_prefix/etc/php-fpm.conf.default" "$pkg_prefix/etc/php-fpm.conf"
+  # Run as the hab user by default, as it's more likely to exist than nobody.
+  sed -i "s/nobody/hab/g" "$pkg_prefix/etc/php-fpm.conf"
+}
+
 do_check() {
   make test
 }
@@ -72,3 +98,4 @@ do_end() {
     rm -fv /usr/bin/xml2-config
   fi
 }
+
