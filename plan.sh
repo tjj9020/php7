@@ -86,6 +86,8 @@ do_install() {
   mv "$pkg_prefix/etc/php-fpm.conf.default" "$pkg_prefix/etc/php-fpm.conf"
   # Run as the hab user by default, as it's more likely to exist than nobody.
   sed -i "s/nobody/hab/g" "$pkg_prefix/etc/php-fpm.conf"
+
+  ln -s $pkg_prefix/sbin/php-fpm $pkg_prefix/bin/php-fpm
 }
 
 do_check() {
