@@ -31,6 +31,8 @@ pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
 pkg_lib_dirs=(lib)
 pkg_interpreters=(bin/php)
+pkg_expose="8000"
+pkg_svc_user="root"
 
 do_download() {
   do_default_download
