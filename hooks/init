@@ -2,4 +2,10 @@
 
 exec 2>&1
 
-mkdir -p {{pkg.svc_var_path}}/php-fpm/log
+mkdir -p {{pkg.svc_var_path}}/log
+mkdir -p {{pkg.svc_var_path}}/run
+
+echo "{{pkg.svc_var_path}}"
+
+chown hab:hab {{pkg.svc_var_path}}/log
+chown hab:hab {{pkg.svc_var_path}}/run

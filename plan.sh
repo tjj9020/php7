@@ -1,11 +1,12 @@
 pkg_origin=pftim
 pkg_name=php71
 pkg_distname=php
-pkg_version=7.1.0
+pkg_version=7.1.5
 pkg_maintainer="timothy.johnson2@purina.nestle.com"
-pkg_license=('PHP-7.1.0')
+pkg_license=('PHP-3.01')
+pkg_upstream_url=http://php.net/
 pkg_source=http://php.net/get/${pkg_distname}-${pkg_version}.tar.bz2/from/this/mirror
-pkg_shasum=68bcfd7deed5b3474d81dec9f74d122058327e2bed0ac25bbc9ec70995228e61
+pkg_shasum=28eaa4784f1bd8b7dc71206dc8c4375510199432dc17af6906b14d16b3058697
 pkg_filename=${pkg_distname}-${pkg_version}.tar.bz2
 pkg_dirname=${pkg_distname}-${pkg_version}
 pkg_deps=(
@@ -15,30 +16,22 @@ pkg_deps=(
   core/zlib
   core/openssl 
   core/bzip2 
-  pftim/libpng 
+  core/libpng 
   core/libjpeg-turbo 
   pftim/libmcrypt 
-  nsdavidson/mysql-client
+  core/mysql-client
+  core/glibc
 )
 pkg_build_deps=(
   core/bison2 
   core/gcc 
   core/make 
   core/re2c 
-  core/autoconf
 )
 pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
 pkg_lib_dirs=(lib)
 pkg_interpreters=(bin/php)
-pkg_expose="8000"
-pkg_svc_user="root"
-
-do_download() {
-  do_default_download
-  # Download Composer
-  download_file https://getcomposer.org/installer composer-setup.php
-}
 
 do_prepare() {
   # The configure script expects libxml2 binaries to either be in `/usr/bin`, `/usr/local/bin` or be
@@ -52,7 +45,10 @@ do_prepare() {
 
 do_build() {
   ./configure --prefix="$pkg_prefix" \
+    --enable-exif \
     --enable-fpm \
+    --with-fpm-user=hab \
+    --with-fpm-group=hab \
     --enable-mbstring \
     --enable-opcache \
     --with-curl="$(pkg_path_for curl)" \
@@ -68,28 +64,15 @@ do_build() {
     --with-curl="$(pkg_path_for curl)" \
     --with-mysql=mysqlnd \
     --with-mysqli=mysqlnd \
-    --with-pdo-mysql=mysqlnd \
-
+    --with-pdo-mysql=mysqlnd
   make
 }
 
 do_install() {
   do_default_install
 
-  # Install Composer
-  "$pkg_prefix/bin/php" "$HAB_CACHE_SRC_PATH/composer-setup.php" \
-    --filename=composer \
-    --install-dir="$pkg_prefix/bin"
-  fix_interpreter "$pkg_prefix/bin/composer" core/coreutils bin/env
-
-  # Modify PHP-FPM config so it will be able to run out of the box. To run a real
-  # PHP-FPM application you would want to supply your own config with
-  # --fpm-config <file>.
-  mv "$pkg_prefix/etc/php-fpm.conf.default" "$pkg_prefix/etc/php-fpm.conf"
-  # Run as the hab user by default, as it's more likely to exist than nobody.
-  sed -i "s/nobody/hab/g" "$pkg_prefix/etc/php-fpm.conf"
-
   ln -s $pkg_prefix/sbin/php-fpm $pkg_prefix/bin/php-fpm
+
 }
 
 do_check() {
