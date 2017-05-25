@@ -1,5 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 exec 2>&1
 
-exec php-fpm --nodaemonize --php-ini {{pkg.svc_config_path}}/php.ini --fpm-config {{pkg.svc_config_path}}/php-fpm.conf 
+echo "The run file has been run..."
+
+exec php-fpm --nodaemonize --php-ini {{pkg.svc_config_path}}/php.ini --fpm-config {{pkg.svc_config_path}}/php-fpm.conf
+
