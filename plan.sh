@@ -1,7 +1,7 @@
 pkg_origin=pftim
 pkg_name=php71
 pkg_distname=php
-pkg_version=7.1.5
+pkg_version=7.1.11
 pkg_maintainer="timothy.johnson2@purina.nestle.com"
 pkg_license=('PHP-3.01')
 pkg_upstream_url=http://php.net/
@@ -28,6 +28,7 @@ pkg_build_deps=(
   core/make 
   core/re2c 
 )
+pkg_svc_user=root
 pkg_bin_dirs=(bin)
 pkg_include_dirs=(include)
 pkg_lib_dirs=(lib)
